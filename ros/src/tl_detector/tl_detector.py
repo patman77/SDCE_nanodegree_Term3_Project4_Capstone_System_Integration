@@ -41,11 +41,14 @@ class TLDetector(object):
 
         config_string = rospy.get_param("/traffic_light_config")
         self.config = yaml.load(config_string)
+        self.is_sim = self.config["is_sim"]
+        if self.is_sim:
+            print("Simulator on")
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier()
+        self.light_classifier = TLClassifier(self.is_sim)
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -53,8 +56,35 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
 
-        rospy.spin()
-
+        #rospy.spin()
+        self.ros_spin()
+        
+    ### detect at every 10hz
+    ### if detected state count is over than threshold, change state
+    ### if detected state is RED, publish traffic light waypoint
+    def ros_spin(self):
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
+                red_light_wp, state = self.process_traffic_lights()
+                # when detected state is changed, change state value
+                if self.state is not state:
+                    self.state_count = 0
+                    self.state = state
+                # when state count is over than threshold, publish traffic light waypoint
+                # we only need red light waypoint
+                elif self.state_count >= STATE_COUNT_THRESHOLD:
+                    self.last_state = state
+                    red_light_wp = red_lighgt_wp if state == TrafficLight.RED else -1
+                    self.last_wp = red_light_wp
+                    self.upcoming_red_light_pub.publish(Int32(red_light_wp))
+                else:
+                    self.upcoming_red_light.publish(Int32(self.last_wp))
+                self.state_count += 1
+                
+            rate.sleep()
+        
+      
     def pose_cb(self, msg):
         self.pose = msg
 
@@ -79,6 +109,7 @@ class TLDetector(object):
         self.camera_image = msg
         light_wp, state = self.process_traffic_lights()
 
+'''
         '''
         Publish upcoming red lights at camera frequency.
         Each predicted state has to occur `STATE_COUNT_THRESHOLD` number
@@ -96,7 +127,8 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
-
+'''
+        
     def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
