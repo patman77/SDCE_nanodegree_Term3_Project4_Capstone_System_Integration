@@ -55,6 +55,7 @@ class DBWNode(object):
 
         # DONE: Create `Controller` object
         # self.controller = Controller(<Arguments you wish to provide>)
+        self.dbw_enabled  = None
         self.controller = Controller(vehicle_mass=vehicle_mass,
                                      fuel_capacity=fuel_capacity,
                                      brake_deadband=brake_deadband,
@@ -64,7 +65,8 @@ class DBWNode(object):
                                      wheel_base=wheel_base,
                                      steer_ratio=steer_ratio,
                                      max_lat_accel=max_lat_accel,
-                                     max_steer_angle=max_steer_angle)
+                                     max_steer_angle=max_steer_angle,
+                                     dbw_enabled=self.dbw_enabled)
 
         # DONE: Subscribe to all the topics you need to
         rospy.Subscriber('/vehicle/dbw_enabled', Bool        , self.dbw_enabled_cb)
@@ -73,7 +75,7 @@ class DBWNode(object):
 
         self.current_vel  = None
         self.curr_ang_vel = None
-        self.dbw_enabled  = None
+
         self.linear_vel   = None
         self.angular_vel  = None
         self.throttle     = self.steering = self.brake = 0
