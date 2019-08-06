@@ -118,6 +118,7 @@ class TLDetector(object):
         '''
 
         ''' @JongYub Seok: is this meant to be commented? commenting was buggy here
+        '''
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -129,7 +130,7 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
-        '''
+        
         
     def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
