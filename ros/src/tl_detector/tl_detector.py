@@ -11,7 +11,7 @@ import tf
 import cv2
 import yaml
 import math
-import scipy.spatial import KDTree
+from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -109,13 +109,15 @@ class TLDetector(object):
         self.camera_image = msg
         light_wp, state = self.process_traffic_lights()
 
-'''
+
         '''
         Publish upcoming red lights at camera frequency.
         Each predicted state has to occur `STATE_COUNT_THRESHOLD` number
         of times till we start using it. Otherwise the previous stable state is
         used.
         '''
+
+        ''' @JongYub Seok: is this meant to be commented? commenting was buggy here
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -127,7 +129,7 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
-'''
+        '''
         
     def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
