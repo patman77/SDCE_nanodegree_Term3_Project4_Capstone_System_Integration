@@ -1,7 +1,7 @@
 from styx_msgs.msg import TrafficLight
 import tensorflow as tf
 import numpy as np
-import datatime
+import datetime
 
 
 class TLClassifier(object):
