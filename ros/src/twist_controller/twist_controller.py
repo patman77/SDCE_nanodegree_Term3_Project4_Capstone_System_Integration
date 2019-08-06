@@ -1,6 +1,7 @@
 import rospy
 import lowpass
 import pid
+import yaw_controller
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
