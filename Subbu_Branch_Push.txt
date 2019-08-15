@@ -1,0 +1,15 @@
+Testing Commit
+
+Plan for the next few days is as follows:
+
+August 14th - Wednesday - Complete reading all communication on Slack/Trello. Start reading capstone project part of the Udacity Course
+
+August 15th - Thursday - Finish setting up System for project. Complete Udacity Course work for Capstone Project
+
+August 16th - Friday - Begin work on Simulator check to see how much it works as of now
+
+August 17th - Saturday - Implement DBW
+
+August 18th - Sunday - Complete DBW
+
+August 29th - MOnday - Final Touches and push to Github Repo for review with Pat and the team 
