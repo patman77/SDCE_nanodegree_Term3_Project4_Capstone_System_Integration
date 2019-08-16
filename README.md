@@ -5,7 +5,7 @@
 * Team Member 1: Subramanian Elavathur Ranganath "Subbu" <arjunnaru@gmail.com>
 * Team Member 2: Aleksandr Fomenko <xanderfomenko@gmail.com>
 * Team Member 3: Jian Li <lijian2005lj@163.com>
-* Team Member 4: Jongub Suk <suk2662@naver.com>
+* Team Member 4: Yi Yang <davidyy@umich.edu>
 * (Consulting Team Member 5: Ahmed Madbouly <ahmedmadbouly@yahoo.com>)
 
 
