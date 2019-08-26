@@ -42,6 +42,9 @@ class TLDetector(object):
         self.config = yaml.load(config_string)
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
+        # debug camera topic
+        self.image_detect_pub = rospy.Publisher('/image_color_detect', Image, queue_size=1)
+
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
@@ -106,7 +109,7 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        #TODO implement
+        # implemented
         closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         return closest_idx
 
@@ -120,15 +123,17 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
         
         """
-        return light.state
-        # if(not self.has_image):
-        #     self.prev_light_loc = None
-        #     return False
+        # return light.state
+        if(not self.has_image):
+            self.prev_light_loc = None
+            return False
 
-        # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
-        # #Get classification
-        # return self.light_classifier.get_classification(cv_image)
+        #Get classification
+        tl_color, img_det = self.light_classifier.get_classification(cv_image)
+        self.image_detect_pub.publish(self.bridge.cv2_to_imgmsg(img_det))
+        return tl_color
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -147,7 +152,7 @@ class TLDetector(object):
         if(self.pose):
             car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y)
 
-            #TODO find the closest visible traffic light (if one exists)
+            # find the closest visible traffic light (if one exists)
             diff = len(self.waypoints.waypoints)
             for i, light in enumerate(self.lights):
                 # Get stopline waypoint index
