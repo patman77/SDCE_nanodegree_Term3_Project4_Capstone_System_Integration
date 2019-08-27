@@ -74,7 +74,7 @@ class TLClassifier(object):
 
                         cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), (0,255,0), 3)
                     
-                        txt = str(clas) + ': ' + str(score)
+                        txt = '%.2f'%score
                         cv2.putText(image_np, txt,(xtl, ytl - 20), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 1,(0,255,0), 3)
 
