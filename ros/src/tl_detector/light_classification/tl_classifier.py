@@ -64,6 +64,9 @@ class TLClassifier(object):
                     [detection_boxes, detection_scores, detection_classes, num_detections],
                     feed_dict={image_tensor: image_np_expanded})
 
+                # Filter for robust tl_classification when there are multiple of them
+                tl_states = []
+
                 for bbox, score, clas in zip(boxes[0], scores[0], classes[0]):
 
                     if (score > 0.3) and (clas == 10):
@@ -89,13 +92,17 @@ class TLClassifier(object):
                         sections = np.hstack((np.mean(cr_v_img[:section_h]), 
                                               np.mean(cr_v_img[section_h:2*section_h]), 
                                               np.mean(cr_v_img[2*section_h:])))
-                        tl_state = np.argmax(sections)
+                        tl_st = np.argmax(sections)
+                        tl_states.append(tl_st)
 
                         # Draw debug information on the frame
                         cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), (0,255,0), 3)
                     
-                        txt = '%d: %.2f'%(tl_state, score)
+                        txt = '%d: %.2f'%(tl_st, score)
                         cv2.putText(image_np, txt,(xtl, ytl - 20), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 1,(0,255,0), 3)
+
+                if len(set(tl_states)) == 1:
+                    tl_state = tl_states[0]
 
         return tl_state, image_np
