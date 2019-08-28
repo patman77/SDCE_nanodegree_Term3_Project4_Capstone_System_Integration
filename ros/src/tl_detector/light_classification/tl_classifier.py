@@ -42,6 +42,8 @@ class TLClassifier(object):
 
         """
         #TODO implement light color prediction
+        tl_state = TrafficLight.UNKNOWN
+
         with self.detection_graph.as_default():
             with tf.Session(graph=self.detection_graph) as sess:
                 # Definite input and output Tensors for self.detection_graph
@@ -72,10 +74,28 @@ class TLClassifier(object):
                         ybr = int(bbox[2] * image_np.shape[0])
                         xbr = int(bbox[3] * image_np.shape[1])
 
+                        # Classify the color of the traffic light
+                        # Crop the tl bbox
+                        tl_img = image_np[ytl:ybr, xtl:xbr]
+                        # Crop margins
+                        offset = int(tl_img.shape[1]/4)
+                        cr_img = tl_img[offset:-offset, offset:-offset]
+
+                        # Convert to HSV and extract Value part from the image
+                        cr_v_img = cv2.cvtColor(cr_img, cv2.COLOR_RGB2HSV)[:,:,2]
+
+                        # Finding mean intensities of each section
+                        section_h = int(cr_img.shape[0]/3)
+                        sections = np.hstack((np.mean(cr_v_img[:section_h]), 
+                                              np.mean(cr_v_img[section_h:2*section_h]), 
+                                              np.mean(cr_v_img[2*section_h:])))
+                        tl_state = np.argmax(sections)
+
+                        # Draw debug information on the frame
                         cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), (0,255,0), 3)
                     
-                        txt = '%.2f'%score
+                        txt = '%d: %.2f'%(tl_state, score)
                         cv2.putText(image_np, txt,(xtl, ytl - 20), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 1,(0,255,0), 3)
 
-        return TrafficLight.UNKNOWN, image_np
+        return tl_state, image_np
