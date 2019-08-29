@@ -12,6 +12,8 @@ class TLClassifier(object):
         # TODO: Move this parameter to the config_string
         MODEL_NAME = 'ssd_inception_v2_coco_2018_01_28'
         PATH_TO_CKPT = os.path.join(MODEL_NAME, 'frozen_inference_graph.pb')
+        self.tl_colors = ['Red', 'Yellow', 'Green', '-', 'Undefined']
+        self.tl_colorCodes = [(0, 0, 255), (0, 255, 255), (0, 255, 0), (0, 0, 0), (200, 200, 200)]
 
 
         # Load frozen TF model to memory
@@ -77,7 +79,6 @@ class TLClassifier(object):
         for bbox, score, clas in zip(boxes[0], scores[0], classes[0]):
 
             if (score > 0.3) and (clas == 10) and (0.07 < (bbox[2] - bbox[0]) < 0.5):
-                print(clas, bbox, score)
 
                 ytl = int(bbox[0] * image_np.shape[0])
                 xtl = int(bbox[1] * image_np.shape[1])
@@ -105,18 +106,23 @@ class TLClassifier(object):
                                           np.mean(cr_v_img[2*section_h:])))
                     tl_st = np.argmax(sections)
                     tl_states.append(tl_st)
+
+                    # Draw debug information on the frame
+                    cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), self.tl_colorCodes[tl_st], 3)
+                
+                    txt = '%s: %.2f'%(self.tl_colors[tl_st][0], score)
+                    cv2.putText(image_np, txt,(xtl, ytl - 20), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, self.tl_colorCodes[tl_st], 3)
                 else:
                     tl_st = TrafficLight.UNKNOWN
 
-                # Draw debug information on the frame
-                cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), (0,255,0), 3)
-            
-                txt = '%d: %.2f'%(tl_st, score)
-                cv2.putText(image_np, txt,(xtl, ytl - 20), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1,(0,255,0), 3)
+                # debug
+                print("%s: %.3f, bbox: %s"%(self.tl_colors[tl_st], score, bbox))
 
         if len(set(tl_states)) == 1:
             tl_state = tl_states[0]
+
+        cv2.rectangle(image_np, (0, 0), image_np.shape[1::-1], self.tl_colorCodes[tl_state], 30)
 
         # Update variables for frames skipping when running on a CPU
         if not self.on_gpu:

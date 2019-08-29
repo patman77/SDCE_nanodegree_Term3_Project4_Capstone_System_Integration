@@ -12,8 +12,6 @@ import tf
 import cv2
 import yaml
 
-STATE_COUNT_THRESHOLD = 3
-
 class TLDetector(object):
     def __init__(self):
         rospy.init_node('tl_detector')
@@ -48,6 +46,13 @@ class TLDetector(object):
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
+
+        # Increase threshold on CPU due to frames skipping
+        if self.light_classifier.on_gpu:
+            self.STATE_COUNT_THRESHOLD = 3
+        else:
+            self.STATE_COUNT_THRESHOLD = 5
+
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -90,7 +95,7 @@ class TLDetector(object):
         if self.state != state:
             self.state_count = 0
             self.state = state
-        elif self.state_count >= STATE_COUNT_THRESHOLD:
+        elif self.state_count >= self.STATE_COUNT_THRESHOLD:
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
@@ -134,7 +139,10 @@ class TLDetector(object):
 
         #Get classification
         tl_color, img_det = self.light_classifier.get_classification(cv_image)
+
+        #debug
         self.image_detect_pub.publish(self.bridge.cv2_to_imgmsg(img_det, encoding="bgr8"))
+
         return tl_color
 
     def process_traffic_lights(self):
@@ -175,7 +183,8 @@ class TLDetector(object):
                 state = TrafficLight.RED
             
             # debug
-            print(diff, state)
+            print("%s waypoints till next stop. Recent detection is %s"%
+                (diff, self.light_classifier.tl_colors[state]))
             
             return line_wp_idx, state
 
