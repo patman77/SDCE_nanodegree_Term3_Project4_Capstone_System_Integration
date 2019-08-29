@@ -39,7 +39,7 @@ class TLClassifier(object):
         self.sess = tf.Session(graph=self.detection_graph, config=config)
 
         # Variables for frames skipping when running on a CPU
-        self.on_gpu = tf.test.is_gpu_available()
+        self.on_gpu = tf.test.is_gpu_available(cuda_only=True)
         self.skip_frame = False
         self.last_state = TrafficLight.UNKNOWN
         self.last_image_np = np.zeros(1)
