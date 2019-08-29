@@ -38,6 +38,12 @@ class TLClassifier(object):
 
         self.sess = tf.Session(graph=self.detection_graph, config=config)
 
+        # Variables for frames skipping when running on a CPU
+        self.on_gpu = tf.test.is_gpu_available()
+        self.skip_frame = False
+        self.last_state = TrafficLight.UNKNOWN
+        self.last_image_np = np.zeros(1)
+
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
 
@@ -52,6 +58,12 @@ class TLClassifier(object):
         tl_state = TrafficLight.UNKNOWN
 
         image_np = np.array(image).astype(np.uint8)
+
+        # Frames skipping when running on a CPU
+        if not self.on_gpu and self.skip_frame:
+            self.skip_frame = not self.skip_frame
+            return self.last_state, self.last_image_np
+
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(image_np, axis=0)
         # Actual detection.
@@ -105,5 +117,11 @@ class TLClassifier(object):
 
         if len(set(tl_states)) == 1:
             tl_state = tl_states[0]
+
+        # Update variables for frames skipping when running on a CPU
+        if not self.on_gpu:
+            self.last_state = tl_state
+            self.skip_frame = not self.skip_frame
+            self.last_image_np = image_np
 
         return tl_state, image_np
