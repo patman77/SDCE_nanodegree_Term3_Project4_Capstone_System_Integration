@@ -46,14 +46,10 @@ class TLClassifier(object):
 
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
+            image (cv::Mat): image containing debug detection output
 
         """
-        #TODO implement light color prediction
         tl_state = TrafficLight.UNKNOWN
-
-        # with self.detection_graph.as_default():
-            # with tf.Session(graph=self.detection_graph) as sess:
-
 
         image_np = np.array(image).astype(np.uint8)
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
@@ -68,7 +64,7 @@ class TLClassifier(object):
 
         for bbox, score, clas in zip(boxes[0], scores[0], classes[0]):
 
-            if (score > 0.3) and (clas == 10):
+            if (score > 0.3) and (clas == 10) and (0.07 < (bbox[2] - bbox[0]) < 0.5):
                 print(clas, bbox, score)
 
                 ytl = int(bbox[0] * image_np.shape[0])
@@ -78,22 +74,27 @@ class TLClassifier(object):
 
                 # Classify the color of the traffic light
                 # Crop the tl bbox
-                # TODO: Add aspect ratio check
                 tl_img = image_np[ytl:ybr, xtl:xbr]
                 # Crop margins
                 offset = int(tl_img.shape[1]/4)
                 cr_img = tl_img[offset:-offset, offset:-offset]
 
-                # Convert to HSV and extract Value part from the image
-                cr_v_img = cv2.cvtColor(cr_img, cv2.COLOR_RGB2HSV)[:,:,2]
+                # Aspect ratio check
+                asp_rat = cr_img.shape[0] / cr_img.shape[1]
 
-                # Finding mean intensities of each section
-                section_h = int(cr_img.shape[0]/3)
-                sections = np.hstack((np.mean(cr_v_img[:section_h]), 
-                                      np.mean(cr_v_img[section_h:2*section_h]), 
-                                      np.mean(cr_v_img[2*section_h:])))
-                tl_st = np.argmax(sections)
-                tl_states.append(tl_st)
+                if 1.5 < asp_rat < 5:
+                    # Convert to HSV and extract Value part from the image
+                    cr_v_img = cv2.cvtColor(cr_img, cv2.COLOR_RGB2HSV)[:,:,2]
+
+                    # Finding mean intensities of each section
+                    section_h = int(cr_img.shape[0]/3)
+                    sections = np.hstack((np.mean(cr_v_img[:section_h]), 
+                                          np.mean(cr_v_img[section_h:2*section_h]), 
+                                          np.mean(cr_v_img[2*section_h:])))
+                    tl_st = np.argmax(sections)
+                    tl_states.append(tl_st)
+                else:
+                    tl_st = TrafficLight.UNKNOWN
 
                 # Draw debug information on the frame
                 cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), (0,255,0), 3)

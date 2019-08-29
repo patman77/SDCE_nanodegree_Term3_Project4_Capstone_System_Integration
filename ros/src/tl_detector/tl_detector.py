@@ -169,6 +169,8 @@ class TLDetector(object):
 
         if closest_light:
             state = self.get_light_state(closest_light)
+
+            # TODO: Convert distance checking to meters
             if (state == TrafficLight.YELLOW) and (diff < 40):
                 state = TrafficLight.RED
             
