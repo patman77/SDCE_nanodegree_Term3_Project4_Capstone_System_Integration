@@ -138,7 +138,7 @@ class TLDetector(object):
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         #Get classification
-        tl_color, img_det = self.light_classifier.get_classification(cv_image)
+        tl_color, img_det = self.light_classifier.get_classification(cv_image, roi=self.config['roi'])
 
         #debug
         self.image_detect_pub.publish(self.bridge.cv2_to_imgmsg(img_det, encoding="bgr8"))

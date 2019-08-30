@@ -45,7 +45,7 @@ class TLClassifier(object):
         self.last_state = TrafficLight.UNKNOWN
         self.last_image_np = np.zeros(1)
 
-    def get_classification(self, image):
+    def get_classification(self, image, roi):
         """Determines the color of the traffic light in the image
 
         Args:
@@ -58,7 +58,14 @@ class TLClassifier(object):
         """
         tl_state = TrafficLight.UNKNOWN
 
+        # Input image preprocessing
         image_np = np.array(image).astype(np.uint8)
+        ymin = roi[0] * image_np.shape[0]
+        xmin = roi[1] * image_np.shape[1]
+        ymax = roi[2] * image_np.shape[0]
+        xmax = roi[3] * image_np.shape[1]
+
+        image_cropped = image_np[ymin:ymax, xmin:xmax]
 
         # Frames skipping when running on a CPU
         if not self.on_gpu and self.skip_frame:
@@ -66,7 +73,7 @@ class TLClassifier(object):
             return self.last_state, self.last_image_np
 
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-        image_np_expanded = np.expand_dims(image_np, axis=0)
+        image_np_expanded = np.expand_dims(image_cropped, axis=0)
         # Actual detection.
         (boxes, scores, classes, num) = self.sess.run(
             [self.detection_boxes, self.detection_scores, self.detection_classes, self.num_detections],
@@ -79,14 +86,14 @@ class TLClassifier(object):
 
             if (score > 0.3) and (clas == 10) and (0.07 < (bbox[2] - bbox[0]) < 0.5):
 
-                ytl = int(bbox[0] * image_np.shape[0])
-                xtl = int(bbox[1] * image_np.shape[1])
-                ybr = int(bbox[2] * image_np.shape[0])
-                xbr = int(bbox[3] * image_np.shape[1])
+                ytl = int(bbox[0] * image_cropped.shape[0])
+                xtl = int(bbox[1] * image_cropped.shape[1])
+                ybr = int(bbox[2] * image_cropped.shape[0])
+                xbr = int(bbox[3] * image_cropped.shape[1])
 
                 # Classify the color of the traffic light
                 # Crop the tl bbox
-                tl_img = image_np[ytl:ybr, xtl:xbr]
+                tl_img = image_cropped[ytl:ybr, xtl:xbr]
                 # Crop margins
                 offset = int(tl_img.shape[1]/4)
                 cr_img = tl_img[offset:-offset, offset:-offset]
@@ -107,10 +114,10 @@ class TLClassifier(object):
                     tl_states.append(tl_st)
 
                     # Draw debug information on the frame
-                    cv2.rectangle(image_np, (xtl, ytl), (xbr, ybr), self.tl_colorCodes[tl_st], 3)
+                    cv2.rectangle(image_np, (xmin+xtl, ymin+ytl), (xmax+xbr, ymax+ybr), self.tl_colorCodes[tl_st], 3)
                 
                     txt = '%s: %.2f'%(self.tl_colors[tl_st][0], score)
-                    cv2.putText(image_np, txt,(xtl, ytl - 20), 
+                    cv2.putText(image_np, txt,(xmin+xtl, ymin+ytl - 20), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, self.tl_colorCodes[tl_st], 3)
                 else:
                     tl_st = TrafficLight.UNKNOWN
