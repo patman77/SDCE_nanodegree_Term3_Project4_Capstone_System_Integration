@@ -60,10 +60,10 @@ class TLClassifier(object):
 
         # Input image preprocessing
         image_np = np.array(image).astype(np.uint8)
-        ymin = roi[0] * image_np.shape[0]
-        xmin = roi[1] * image_np.shape[1]
-        ymax = roi[2] * image_np.shape[0]
-        xmax = roi[3] * image_np.shape[1]
+        ymin = int(roi[0] * image_np.shape[0])
+        xmin = int(roi[1] * image_np.shape[1])
+        ymax = int(roi[2] * image_np.shape[0])
+        xmax = int(roi[3] * image_np.shape[1])
 
         image_cropped = image_np[ymin:ymax, xmin:xmax]
 
@@ -84,14 +84,15 @@ class TLClassifier(object):
 
         for bbox, score, clas in zip(boxes[0], scores[0], classes[0]):
 
-            if (score > 0.3) and (clas == 10) and (0.07 < (bbox[2] - bbox[0]) < 0.5):
+            if (score > 0.3) and (clas == 10) and \
+                (0.07/(roi[2]-roi[0]) < (bbox[2] - bbox[0]) < 0.5/(roi[2]-roi[0])):
 
                 ytl = int(bbox[0] * image_cropped.shape[0])
                 xtl = int(bbox[1] * image_cropped.shape[1])
                 ybr = int(bbox[2] * image_cropped.shape[0])
                 xbr = int(bbox[3] * image_cropped.shape[1])
 
-                # Classify the color of the traffic light
+                ### Classify the color of the traffic light
                 # Crop the tl bbox
                 tl_img = image_cropped[ytl:ybr, xtl:xbr]
                 # Crop margins
@@ -114,11 +115,14 @@ class TLClassifier(object):
                     tl_states.append(tl_st)
 
                     # Draw debug information on the frame
-                    cv2.rectangle(image_np, (xmin+xtl, ymin+ytl), (xmax+xbr, ymax+ybr), self.tl_colorCodes[tl_st], 3)
+                    cv2.rectangle(image_np, (xmin+xtl, ymin+ytl), (xmin+xbr, ymin+ybr), self.tl_colorCodes[tl_st], 3)
                 
                     txt = '%s: %.2f'%(self.tl_colors[tl_st][0], score)
-                    cv2.putText(image_np, txt,(xmin+xtl, ymin+ytl - 20), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, self.tl_colorCodes[tl_st], 3)
+
+                    bot_pos = ymin+ytl-10 if ymin+ytl-10 > 30 else ymin+ybr+25
+                    left_pos = xmin+xtl if xmin+xtl > 0 else 0
+                    cv2.putText(image_np, txt,(left_pos, bot_pos), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.tl_colorCodes[tl_st], 2)
                 else:
                     tl_st = TrafficLight.UNKNOWN
 
@@ -128,7 +132,7 @@ class TLClassifier(object):
         if len(set(tl_states)) == 1:
             tl_state = tl_states[0]
 
-        cv2.rectangle(image_np, (0, 0), image_np.shape[1::-1], self.tl_colorCodes[tl_state], 30)
+        cv2.rectangle(image_np, (xmin, ymin), (xmax, ymax), self.tl_colorCodes[tl_state], 15)
 
         # Update variables for frames skipping when running on a CPU
         if not self.on_gpu:

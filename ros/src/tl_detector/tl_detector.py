@@ -60,6 +60,11 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
 
+        if self.config['is_site']:
+            self.pose = PoseStamped()
+            self.pose.pose.position.x = 0
+            self.pose.pose.position.y = 0
+
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -159,7 +164,7 @@ class TLDetector(object):
 
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
-        if(self.pose):
+        if self.pose:
             car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y)
 
             # find the closest visible traffic light (if one exists)
