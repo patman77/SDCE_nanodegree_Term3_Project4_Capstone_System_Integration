@@ -7,11 +7,10 @@ import cv2
 
 
 class TLClassifier(object):
-    def __init__(self):
+    def __init__(self, model_name):
         # Variables
-        # TODO: Move this parameter to the config_string
-        MODEL_NAME = 'ssd_inception_v2_coco_2018_01_28'
-        PATH_TO_CKPT = os.path.join(MODEL_NAME, 'frozen_inference_graph.pb')
+
+        PATH_TO_CKPT = os.path.join(model_name, 'frozen_inference_graph.pb')
         self.tl_colors = ['Red', 'Yellow', 'Green', '-', 'Undefined']
         self.tl_colorCodes = [(0, 0, 255), (0, 255, 255), (0, 255, 0), (0, 0, 0), (200, 200, 200)]
 

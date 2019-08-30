@@ -45,7 +45,7 @@ class TLDetector(object):
 
 
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier()
+        self.light_classifier = TLClassifier(self.config['model_name'])
 
         # Increase threshold on CPU due to frames skipping
         if self.light_classifier.on_gpu:

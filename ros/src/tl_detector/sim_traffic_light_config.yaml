@@ -11,3 +11,4 @@ stop_line_positions:
     - [161.76, 2303.82]
     - [351.84, 1574.65]
 is_site: False
+model_name: 'ssd_inception_v2_coco_2018_01_28'
