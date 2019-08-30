@@ -49,35 +49,49 @@ Essentially, it's these steps:
 
 10. (Optionally): Install NVIDIA GPU driver, simulator and DL based tl detection/classification will run faster
 
-This method was also motivated by the fact that we had a lot of issues with latencies, high CPU load etc. in the beginning when we used VM only.
+This method was also motivated by the fact that we had a lot of issues with latencies, high CPU load etc. in the beginning when we used VM only. This led to instabilities and latencies in the car's steeering, resulting in leaving the lane or even going off-road.
 
 ### Concepts
 
-We all went through the classroom lessons and implemented all the stuff presented in the video walkthroughs including the ROS nodes waypoint updater, DBW. One essential part remaining was the traffic light and detection. For the simulation we recognized that traffic lights are available as 'ground truth', which worked fine, compare the following video:
+We all went through the classroom lessons and implemented the concepts presented in the video walkthroughs including the ROS nodes waypoint updater, DBW, and later the traffic light detection. One essential part remaining was exactly this traffic light detection and classification. For the simulation we recognized that traffic lights are available as 'ground truth', which worked fine, compare the following video:
 
-[Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264.mp4)
+[![Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264_00000071.png)](./results/capstone-submission01-2019-08-29_05.25.15_h264.mp4)
 
-For real camera images, we though about two possibilities:
+For real camera images without the available ground truth information from the simulator, we though about two possibilities:
 * using a classical approach, namely HOG+SVM, as we already implemented in Term 1 for the vehicle detection
 * using one of the deep learning approaches
   * specialized model trained with a dedicated set of images with traffic lights
   * pre-trained model
 
-We chose deep learning, as from literature it is well known that very good results can be achieved. Also we wanted to avoid parameter tuning, which is often the case for classical methods.
+We chose deep learning, as from literature it is well known that very good results can be achieved with it. Also we wanted to avoid parameter tuning, which is often the case for classical methods.
 
-Although we had some GPU available for training, also on a GPU cluster, we decided to use pretrained models. From the object detection lab in the course, we used the existing approaches from the "Tensorflow  detection model zoo".
+Although we had some GPUs available for training (also on a GPU cluster), we decided to use pretrained models, also due to the lack of remaining time. From the object detection lab in the course, we used the existing approaches from the "Tensorflow detection model zoo".
 
 ### Implementation
+
 
 ##
 ### Optimization and System Design
 
 From the detection lab in the course, we initially tried the DL models 
 
+## Results
+
+### Simulator
+Finally, the entire system works as expected, which can be seen in the following video:
+
+[![Final run in the simulator with DL based tl detection](./results/full_run_gpu_h264_00000170.png)](./results/full_run_gpu_h264.mp4)
+
+An additional ROS topic "/image_color_detect", which can be seen in the top left corner shows the current detections, together with the confidences. The rqt topic monitor in the middle clearly shows that all messages related to vehicle steering are approximately at the desired 50Hz. On the right side we see the GPU load of 40%, rendered with "nvidia-smi". On that particular system, we had tensorflow-gpu on an NVIDIA GeForce GTX 1060, so below the hardware equipment of Carla with a Titan X. On the lower right "top" shows the approx. CPU loads:
+1. The simulator with 130%
+2. styx server 65%
+3. traffic light detection 60%
+
+### Real world examples
 
 ### Lessons Learned
 
-
+We learned that the entire system heavily depends on the available hardware. If GPU 
 
 
 The rest of this document we kept to have it as a reference and a tutorial for playing the rosbag files.
