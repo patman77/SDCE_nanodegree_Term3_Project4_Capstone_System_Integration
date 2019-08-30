@@ -15,16 +15,21 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 Approaching the final capstone project, we formed our above mentioned team called "Neural Riders On The Storm" consisting of 4 regular team members (Team Lead + Team Member 1-4) with an additional "consultant", who already passed the SDC Nanodegree before. We have the offifical statement from the Udacity Support that also 6 members instead of 5 are allowed. If this should be an issue, please omit the last consulting member for this team submission as he already has the SDC Nanodegree certificate.
 
+### Organisation
+
+We created a slack channel "neuralriders_ot_storm" to communicate. Slack also offers desktop and mobile apps so we could communicate very efficiently.
+Additionally, we created a trello board (http://www.trello.com) to organize our tasks, including due dates, and a timeline.
+
 ### Installation
 
-After having analyzed the possibilities Docker, web-based Workspace, Udacity Virtual Machine and native installation, we finally decided for a mixture of the two latter ones: We converted the Udacity VM to a physical device and booted from that device (we just used an external SSD).
+After having analyzed the possibilities Docker, web-based Workspace, Udacity Virtual Machine and native installation, we finally decided for a mixture of the two latter ones: We converted the Udacity VM to a physical device and booted from that device (e.g. from an external SSD).
 
 By this, we could overcome many disadvantages of the other possibilities:
 
 * Docker: many of our team members were not really familiar with that method and have seldomly used it throughout the course
 * Web-based Workspace: Limited GPU time, needs internet access
 * Udacity Virtual Machine: pretty slow with VirtualBox and also with Parallels, no GPU support in the guest system
-* Native installation: Necessary to install ROS manually
+* Native installation: Necessary to install ROS manually, no support from Udacity
 
 We described this approach also on "Knowledge" under the link https://knowledge.udacity.com/questions/53477.<br>
 Essentially, it's these steps:
@@ -57,23 +62,39 @@ We all went through the classroom lessons and implemented the concepts presented
 
 [![Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264_00000071.png)](./results/capstone-submission01-2019-08-29_05.25.15_h264.mp4)
 
-For real camera images without the available ground truth information from the simulator, we though about two possibilities:
+For real camera images without the available ground truth information from the simulator, we thought about two possibilities:
 * using a classical approach, namely HOG+SVM, as we already implemented in Term 1 for the vehicle detection
 * using one of the deep learning approaches
-  * specialized model trained with a dedicated set of images with traffic lights
+  * specialized model trained with a dedicated set of training images with traffic lights
   * pre-trained model
 
-We chose deep learning, as from literature it is well known that very good results can be achieved with it. Also we wanted to avoid parameter tuning, which is often the case for classical methods.
+We chose deep learning, as from literature it is well known that very good results can be achieved with DL. Also we wanted to avoid parameter tuning, which is often the case for classical methods.
 
 Although we had some GPUs available for training (also on a GPU cluster), we decided to use pretrained models, also due to the lack of remaining time. From the object detection lab in the course, we used the existing approaches from the "Tensorflow detection model zoo".
 
 ### Implementation
 
+All the concepts have been implemented into the ROS nodes, as proposed in the classroom. For better understanding, we visualized the overall node / message layout with rqt_graph contained in ROS kinetic:
+
+![Traffic Light Detection in the simulator](./Doc/ROS_System_Overview/rqt_graph_arjunnaru.jpg)
 
 ##
 ### Optimization and System Design
 
-From the detection lab in the course, we initially tried the DL models 
+From the detection lab in the course, we initially tried the DL models to get a first understanding how traffic light detection. We derived the runtimes on a laptop GPU just to get a rough understanding of performances and runtimes. Later we switched to desktop GPUs to be comparable to the Titan X in Carla. We gained these initial insights:
+* "ssd_mobilenet_v1" from 2017, < 75 ms/frame
+* "rfcn_resnet101", <110 ms/frame
+* "faster_rcnn_inception_resnet_v2", <450 ms/frame
+
+From the following video it can be seen that the better the model, the better the detections are, coming with higher runtimes (see above). 
+
+[![tl detection on real world examples](./results/all_00000027.png)](./results/all.mp4)
+
+Nevertheless we used ssd_mobilenet from 2018 (ssd_inception_v2_coco_2018_01_28) for lower runtimes in the beginning for 2 reasons:
+* we started with tensorflow without GPU support, giving us over 400% CPU load
+* also on potential reviewers computers, there could be no GPU support, and we wanted to avoid that the reviewers system gets overloaded while testing on the simulator
+
+Additionally, we only analyze every Nth frame (N=2) to be on the safe side. 
 
 ## Results
 
@@ -83,18 +104,58 @@ Finally, the entire system works as expected, which can be seen in the following
 [![Final run in the simulator with DL based tl detection](./results/full_run_gpu_h264_00000170.png)](./results/full_run_gpu_h264.mp4)
 
 An additional ROS topic "/image_color_detect", which can be seen in the top left corner shows the current detections, together with the confidences. The rqt topic monitor in the middle clearly shows that all messages related to vehicle steering are approximately at the desired 50Hz. On the right side we see the GPU load of 40%, rendered with "nvidia-smi". On that particular system, we had tensorflow-gpu on an NVIDIA GeForce GTX 1060, so below the hardware equipment of Carla with a Titan X. On the lower right "top" shows the approx. CPU loads:
+
 1. The simulator with 130%
 2. styx server 65%
 3. traffic light detection 60%
 
 ### Real world examples
 
+We also tested the traffic light detection on real word examples, given by the supplied rosbag files:
+
+[![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](./results/tl-realvideo01-2019-08-29_23.43.14.mp4)
+
+[![tl detection on 1st rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](./results/tl-realvideo02-2019-08-29_23.53.13.mp4)
+
+[![tl detection on 1st rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](./results/tl-realvideo03-2019-08-30_00.02.08.mp4)
+
+The sequences (especially the last one) are pretty tough because of:
+* front window reflections
+* dirt on the window
+* the traffic light color is not always clearly visible
+* exposure time pretty high sometimes
+* camera images in the last sequence not sharp
+
+Therefore, we decided to test further DL object detection models to improve the detection rate, insights:
+* faster_rcnn_resnet101_coco_2018_01_28 106ms 32% detects really good, but only at 5Hz;
+* rfcn_resnet101_coco_2018_01_28 92ms 30% good detector, but only about 6Hz;
+* faster_rcnn_resnet50_coco_2018_01_28 89ms 30% almost the same as previous;
+* faster_rcnn_inception_v2_coco_2018_01_28 58ms 28% similar detection quality, but 2x faster than prev one — 14Hz on a GeForce GTX 1060
+
+In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
+
 ### Lessons Learned
 
-We learned that the entire system heavily depends on the available hardware. If GPU 
+We learned that the entire system heavily depends on the available hardware. Especially, if the GPU is enabled, tensorflow can benefit from it, and the overall runtime improves heavily.
+
+<br>
+The rest of this document is the original README.md that we kept as a reference and a tutorial for playing the rosbag files.
+
+<br><br><br>
 
 
-The rest of this document we kept to have it as a reference and a tutorial for playing the rosbag files.
+
+
+
+
+
+
+
+
+
+
+
+
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
