@@ -1,6 +1,6 @@
-### Final Capstone Project SDC System Integration
+## Final Capstone Project SDC System Integration
 ### Team: Neural Riders On The Storm
-#### Team Members:
+### Team Members:
 * Team Lead: Patrick Klie <info@patman-industries.com>
 * Team Member 1: Subramanian Elavathur Ranganath "Subbu" <arjunnaru@gmail.com>
 * Team Member 2: Aleksandr Fomenko <xanderfomenko@gmail.com>
@@ -10,6 +10,77 @@
 
 
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+
+### Introduction
+
+Approaching the final capstone project, we formed our above mentioned team called "Neural Riders On The Storm" consisting of 4 regular team members (Team Lead + Team Member 1-4) with an additional "consultant", who already passed the SDC Nanodegree before. We have the offifical statement from the Udacity Support that also 6 members instead of 5 are allowed. If this should be an issue, please omit the last consulting member for this team submission as he already has the SDC Nanodegree certificate.
+
+### Installation
+
+After having analyzed the possibilities Docker, web-based Workspace, Udacity Virtual Machine and native installation, we finally decided for a mixture of the two latter ones: We converted the Udacity VM to a physical device and booted from that device (we just used an external SSD).
+
+By this, we could overcome many disadvantages of the other possibilities:
+
+* Docker: many of our team members were not really familiar with that method and have seldomly used it throughout the course
+* Web-based Workspace: Limited GPU time, needs internet access
+* Udacity Virtual Machine: pretty slow with VirtualBox and also with Parallels, no GPU support in the guest system
+* Native installation: Necessary to install ROS manually
+
+We described this approach also on "Knowledge" under the link https://knowledge.udacity.com/questions/53477.<br>
+Essentially, it's these steps:
+
+1. Get the Udacity VM: wget -c https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/Udacity_VM_Base_V1.0.0.zip
+
+2. Depack: unzip Udacity_VM_Base_V1.0.0.zip
+
+3. Untar: tar xvf Ubuntu\ 64-bit\ Udacity\ VM\ V1.0.0.ova
+
+4. Convert to image: VBoxManage clonehd Ubuntu_64-bit_Udacity_VM_V1.0.0-disk1.vmdk disk.img --format RAW (takes some time)
+
+5. Attach an empty external hard drive and remember device, e.g. /dev/sdc (CAUTION: no typos! Otherwise system can get broken)
+
+6. sudo dd if=./disk.img of=/dev/sdX (with remembered device from above, e.g. /dev/sdc, also takes some time)
+
+7. Optionally enlarge partition: sudo gparted (good for large rosbag files)
+
+8. In BIOS: change boot order so that external drive is preferred
+
+9. Boot from this external drive
+
+10. (Optionally): Install NVIDIA GPU driver, simulator and DL based tl detection/classification will run faster
+
+This method was also motivated by the fact that we had a lot of issues with latencies, high CPU load etc. in the beginning when we used VM only.
+
+### Concepts
+
+We all went through the classroom lessons and implemented all the stuff presented in the video walkthroughs including the ROS nodes waypoint updater, DBW. One essential part remaining was the traffic light and detection. For the simulation we recognized that traffic lights are available as 'ground truth', which worked fine, compare the following video:
+
+[Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264.mp4)
+
+For real camera images, we though about two possibilities:
+* using a classical approach, namely HOG+SVM, as we already implemented in Term 1 for the vehicle detection
+* using one of the deep learning approaches
+  * specialized model trained with a dedicated set of images with traffic lights
+  * pre-trained model
+
+We chose deep learning, as from literature it is well known that very good results can be achieved. Also we wanted to avoid parameter tuning, which is often the case for classical methods.
+
+Although we had some GPU available for training, also on a GPU cluster, we decided to use pretrained models. From the object detection lab in the course, we used the existing approaches from the "Tensorflow  detection model zoo".
+
+### Implementation
+
+##
+### Optimization and System Design
+
+From the detection lab in the course, we initially tried the DL models 
+
+
+### Lessons Learned
+
+
+
+
+The rest of this document we kept to have it as a reference and a tutorial for playing the rosbag files.
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
