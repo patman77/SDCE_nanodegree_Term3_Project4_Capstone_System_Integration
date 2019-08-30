@@ -12,8 +12,6 @@ import tf
 import cv2
 import yaml
 
-STATE_COUNT_THRESHOLD = 3
-
 class TLDetector(object):
     def __init__(self):
         rospy.init_node('tl_detector')
@@ -42,15 +40,30 @@ class TLDetector(object):
         self.config = yaml.load(config_string)
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
+        # debug camera topic
+        self.image_detect_pub = rospy.Publisher('/image_color_detect', Image, queue_size=1)
+
 
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier()
+        self.light_classifier = TLClassifier(self.config['model_name'])
+
+        # Increase threshold on CPU due to frames skipping
+        if self.light_classifier.on_gpu:
+            self.STATE_COUNT_THRESHOLD = 3
+        else:
+            self.STATE_COUNT_THRESHOLD = 5
+
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
+
+        if self.config['is_site']:
+            self.pose = PoseStamped()
+            self.pose.pose.position.x = 0
+            self.pose.pose.position.y = 0
 
         rospy.spin()
 
@@ -87,7 +100,7 @@ class TLDetector(object):
         if self.state != state:
             self.state_count = 0
             self.state = state
-        elif self.state_count >= STATE_COUNT_THRESHOLD:
+        elif self.state_count >= self.STATE_COUNT_THRESHOLD:
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
@@ -106,7 +119,7 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        #TODO implement
+        # implemented
         closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         return closest_idx
 
@@ -120,15 +133,22 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
         
         """
-        return light.state
-        # if(not self.has_image):
-        #     self.prev_light_loc = None
-        #     return False
+        # Next line for test purposes in simulator only
+        # return light.state
 
-        # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        if(not self.has_image):
+            self.prev_light_loc = None
+            return False
 
-        # #Get classification
-        # return self.light_classifier.get_classification(cv_image)
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+
+        #Get classification
+        tl_color, img_det = self.light_classifier.get_classification(cv_image, roi=self.config['roi'])
+
+        #debug
+        self.image_detect_pub.publish(self.bridge.cv2_to_imgmsg(img_det, encoding="bgr8"))
+
+        return tl_color
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -144,10 +164,10 @@ class TLDetector(object):
 
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
-        if(self.pose):
+        if self.pose:
             car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y)
 
-            #TODO find the closest visible traffic light (if one exists)
+            # find the closest visible traffic light (if one exists)
             diff = len(self.waypoints.waypoints)
             for i, light in enumerate(self.lights):
                 # Get stopline waypoint index
@@ -162,6 +182,15 @@ class TLDetector(object):
 
         if closest_light:
             state = self.get_light_state(closest_light)
+
+            # TODO: Convert distance checking to meters
+            if (state == TrafficLight.YELLOW) and (diff < 40):
+                state = TrafficLight.RED
+            
+            # debug
+            print("%s waypoints till next stop. Recent detection is %s"%
+                (diff, self.light_classifier.tl_colors[state]))
+            
             return line_wp_idx, state
 
         return -1, TrafficLight.UNKNOWN
