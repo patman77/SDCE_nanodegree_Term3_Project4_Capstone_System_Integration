@@ -115,7 +115,7 @@ We also tested the traffic light detection on real word examples, given by the s
 
 [![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](https://youtu.be/Mr8ivR8QFG4)
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](./results/tl-realvideo02-2019-08-29_23.53.13.mp4)
+[![tl detection on 1st rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](https://youtu.be/lQmHsSKVL1A)
 
 [![tl detection on 1st rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](./results/tl-realvideo03-2019-08-30_00.02.08.mp4)
 
