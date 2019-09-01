@@ -101,7 +101,7 @@ Additionally, we only analyze every Nth frame (N=2) to be on the safe side.
 ### Simulator
 Finally, the entire system works as expected, which can be seen in the following video:
 
-[![Final run in the simulator with DL based tl detection](./results/full_run_gpu_h264_00000170.png)](./results/full_run_gpu_h264.mp4)
+[![Final run in the simulator with DL based tl detection](./results/full_run_gpu_h264_00000170.png)](https://youtu.be/pw6uTMEGYgM)
 
 An additional ROS topic "/image_color_detect", which can be seen in the top left corner shows the current detections, together with the confidences. The rqt topic monitor in the middle clearly shows that all messages related to vehicle steering are approximately at the desired 50Hz. On the right side we see the GPU load of 40%, rendered with "nvidia-smi". On that particular system, we had tensorflow-gpu on an NVIDIA GeForce GTX 1060, so below the hardware equipment of Carla with a Titan X. On the lower right "top" shows the approx. CPU loads:
 
