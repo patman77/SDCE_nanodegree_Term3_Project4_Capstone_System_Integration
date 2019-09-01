@@ -60,7 +60,7 @@ This method was also motivated by the fact that we had a lot of issues with late
 
 We all went through the classroom lessons and implemented the concepts presented in the video walkthroughs including the ROS nodes waypoint updater, DBW, and later the traffic light detection. One essential part remaining was exactly this traffic light detection and classification. For the simulation we recognized that traffic lights are available as 'ground truth', which worked fine, compare the following video:
 
-[![Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264_00000071.png)](./results/capstone-submission01-2019-08-29_05.25.15_h264.mp4)
+[![Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264_00000071.png)](https://youtu.be/PU90_rMJark)
 
 For real camera images without the available ground truth information from the simulator, we thought about two possibilities:
 * using a classical approach, namely HOG+SVM, as we already implemented in Term 1 for the vehicle detection
