@@ -9,7 +9,6 @@ from cv_bridge import CvBridge
 from light_classification.tl_classifier import TLClassifier
 from scipy.spatial import KDTree
 import tf
-import cv2
 import yaml
 
 class TLDetector(object):
@@ -43,16 +42,6 @@ class TLDetector(object):
         # debug camera topic
         self.image_detect_pub = rospy.Publisher('/image_color_detect', Image, queue_size=1)
 
-
-        self.bridge = CvBridge()
-        self.light_classifier = TLClassifier(self.config['model_name'])
-
-        # Increase threshold on CPU due to frames skipping
-        if self.light_classifier.on_gpu:
-            self.STATE_COUNT_THRESHOLD = 3
-        else:
-            self.STATE_COUNT_THRESHOLD = 5
-
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -60,7 +49,17 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
 
-        if self.config['is_site']:
+        self.STATE_COUNT_THRESHOLD = 3
+
+        self.bridge = CvBridge()
+        self.light_classifier = TLClassifier(self.config['model_name'])
+
+        # Increase threshold on CPU due to frames skipping
+        if not self.light_classifier.on_gpu:
+            self.STATE_COUNT_THRESHOLD = 5
+
+        # For testing on rosbags
+        if self.config['is_bag']:
             self.pose = PoseStamped()
             self.pose.pose.position.x = 0
             self.pose.pose.position.y = 0
@@ -188,7 +187,7 @@ class TLDetector(object):
                 state = TrafficLight.RED
             
             # debug
-            print("%s waypoints till next stop. Recent detection is %s"%
+            rospy.logdebug("%s waypoints till next stop. Recent detection is %s"%
                 (diff, self.light_classifier.tl_colors[state]))
             
             return line_wp_idx, state

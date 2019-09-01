@@ -6,6 +6,6 @@ camera_info:
 stop_line_positions:
     - [8.0, 16.2]
 is_site: True
-is_bag: False
+is_bag: True
 model_name: 'faster_rcnn_inception_v2_coco_2018_01_28'
 roi: [0.0, 0.0, 0.6, 1.0]
