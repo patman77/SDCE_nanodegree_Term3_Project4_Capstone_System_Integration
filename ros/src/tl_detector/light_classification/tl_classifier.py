@@ -72,11 +72,13 @@ class TLClassifier(object):
             self.skip_frame = not self.skip_frame
             return self.last_state, self.last_image_np
 
-        # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+        # Expand dimensions since the model expects images 
+        # to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(image_cropped, axis=0)
         # Actual detection.
         (boxes, scores, classes, num) = self.sess.run(
-            [self.detection_boxes, self.detection_scores, self.detection_classes, self.num_detections],
+            [self.detection_boxes, self.detection_scores, 
+             self.detection_classes, self.num_detections],
             feed_dict={self.image_tensor: image_np_expanded})
 
         # Filter for robust tl_classification when there are multiple of them
@@ -104,7 +106,10 @@ class TLClassifier(object):
 
                 if 1.5 < asp_rat < 5:
                     # Convert to HSV and extract Value part from the image
-                    cr_v_img = cv2.cvtColor(cr_img, cv2.COLOR_RGB2HSV)[:,:,2]
+                    if cv2.__version__ < '3.0.0':
+                        cr_v_img = cv2.cvtColor(cr_img, cv2.CV_BGR2HSV)[:,:,2]
+                    else:
+                        cr_v_img = cv2.cvtColor(cr_img, cv2.COLOR_BGR2HSV)[:,:,2]
 
                     # Finding mean intensities of each section
                     section_h = int(cr_img.shape[0]/3)
@@ -115,14 +120,22 @@ class TLClassifier(object):
                     tl_states.append(tl_st)
 
                     # Draw debug information on the frame
-                    cv2.rectangle(image_np, (xmin+xtl, ymin+ytl), (xmin+xbr, ymin+ybr), self.tl_colorCodes[tl_st], 3)
-                
+                    try:
+                        cv2.rectangle(image_np, (xmin+xtl, ymin+ytl), 
+                                      (xmin+xbr, ymin+ybr), 
+                                      self.tl_colorCodes[tl_st], 3)
+                    except:
+                        pass
+                    
                     txt = '%s: %.2f'%(self.tl_colors[tl_st][0], score)
-
                     bot_pos = ymin+ytl-10 if ymin+ytl-10 > 30 else ymin+ybr+25
                     left_pos = xmin+xtl if xmin+xtl > 0 else 0
-                    cv2.putText(image_np, txt,(left_pos, bot_pos), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.tl_colorCodes[tl_st], 2)
+                    try:
+                        cv2.putText(image_np, txt, (left_pos, bot_pos), 
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, 
+                                    self.tl_colorCodes[tl_st], 2)
+                    except:
+                        pass
                 else:
                     tl_st = TrafficLight.UNKNOWN
 
@@ -132,7 +145,11 @@ class TLClassifier(object):
         if len(set(tl_states)) == 1:
             tl_state = tl_states[0]
 
-        cv2.rectangle(image_np, (xmin, ymin), (xmax, ymax), self.tl_colorCodes[tl_state], 15)
+        try:
+            cv2.rectangle(image_np, (xmin, ymin), (xmax, ymax), 
+                          self.tl_colorCodes[tl_state], 15)
+        except:
+            pass
 
         # Update variables for frames skipping when running on a CPU
         if not self.on_gpu:
