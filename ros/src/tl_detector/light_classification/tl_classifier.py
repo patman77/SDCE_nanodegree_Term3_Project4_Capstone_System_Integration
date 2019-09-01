@@ -107,7 +107,7 @@ class TLClassifier(object):
                 if 1.5 < asp_rat < 5:
                     # Convert to HSV and extract Value part from the image
                     if cv2.__version__ < '3.0.0':
-                        cr_v_img = cv2.cvtColor(cr_img, cv2.CV_BGR2HSV)[:,:,2]
+                        cr_v_img = cv2.cvtColor(cr_img, cv2.cv.CV_BGR2HSV)[:,:,2]
                     else:
                         cr_v_img = cv2.cvtColor(cr_img, cv2.COLOR_BGR2HSV)[:,:,2]
 
