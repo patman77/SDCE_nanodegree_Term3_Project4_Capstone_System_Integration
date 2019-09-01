@@ -88,7 +88,7 @@ From the detection lab in the course, we initially tried the DL models to get a 
 
 From the following video it can be seen that the better the model, the better the detections are, coming with higher runtimes (see above). 
 
-[![tl detection on real world examples](./results/all_00000027.png)](./results/all.mp4)
+[![tl detection on real world examples](./results/all_00000027.png)](https://youtu.be/xgD799cP8xs)
 
 Nevertheless we used ssd_mobilenet from 2018 (ssd_inception_v2_coco_2018_01_28) for lower runtimes in the beginning for 2 reasons:
 * we started with tensorflow without GPU support, giving us over 400% CPU load
