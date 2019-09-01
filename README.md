@@ -157,7 +157,7 @@ In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model
 We learned that the entire system heavily depends on the available hardware. Especially, if the GPU is enabled, tensorflow can benefit from it, and the overall runtime improves heavily.
 
 <br>
-The rest of this document is the original README.md that we kept as a reference and a tutorial for playing the rosbag files. Actually, for testing with rosbag files, we created special launch file, so you need to launch bag.launch, instead of site.launch.
+The rest of this document is the original README.md that we kept as a reference and a tutorial for playing the rosbag files. Except 1 thing, for testing with rosbag files, we created special launch file, so you need to launch bag.launch, instead of site.launch.
 
 <br><br><br>
 
@@ -231,7 +231,7 @@ roslaunch launch/styx.launch
 ```
 4. Run the simulator
 
-### Real world testing
+### Rosbag testing
 1. Download [training bag](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/traffic_light_bag_file.zip) that was recorded on the Udacity self-driving car.
 2. Unzip the file
 ```bash
@@ -241,12 +241,25 @@ unzip traffic_light_bag_file.zip
 ```bash
 rosbag play -l traffic_light_bag_file/traffic_light_training.bag
 ```
-4. Launch your project in site mode
+4. Launch your project in bag mode
 ```bash
 cd CarND-Capstone/ros
-roslaunch launch/site.launch
+catkin_make
+source devel/setup.sh
+roslaunch launch/bag.launch
 ```
 5. Confirm that traffic light detection works on real life images
+
+### Carla running (Udacity Self-Driving Car)
+1. Launch Carla
+2. Launch project in site mode
+```bash
+cd CarND-Capstone/ros
+catkin_make
+source devel/setup.sh
+roslaunch launch/site.launch
+```
+But you know better :)
 
 ### Other library/driver information
 Outside of `requirements.txt`, here is information on other driver/library versions used in the simulator and Carla:
