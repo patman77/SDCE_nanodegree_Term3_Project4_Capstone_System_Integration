@@ -132,7 +132,7 @@ Therefore, we decided to test further DL object detection models to improve the 
 * faster_rcnn_resnet50_coco_2018_01_28 89ms 30% almost the same as previous;
 * faster_rcnn_inception_v2_coco_2018_01_28 58ms 28% similar detection quality, but 2x faster than prev one — 14Hz on a GeForce GTX 1060
 
-in the following videos, the better detection results via the faster_rcnn model can be seen:
+In the following videos, the better detection results via the faster_rcnn model can be seen:
 
 [![improved tl detection on loop rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/Zgs7yY_50fU)
 <br><br>
