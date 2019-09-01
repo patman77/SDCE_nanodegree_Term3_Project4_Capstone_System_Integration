@@ -1,5 +1,9 @@
 ## Final Capstone Project SDC System Integration
+
+![](results/start.gif)
+
 ### Team: Neural Riders On The Storm
+
 ### Team Members:
 * Team Lead: Patrick Klie <info@patman-industries.com>
 * Team Member 1: Subramanian Elavathur Ranganath "Subbu" <arjunnaru@gmail.com>
@@ -81,20 +85,24 @@ All the concepts have been implemented into the ROS nodes, as proposed in the cl
 ##
 ### Optimization and System Design
 
-From the detection lab in the course, we initially tried the DL models to get a first understanding how traffic light detection. We derived the runtimes on a laptop GPU just to get a rough understanding of performances and runtimes. Later we switched to desktop GPUs to be comparable to the Titan X in Carla. We gained these initial insights:
+From the detection lab in the course, we initially tried the DL models to get a first understanding how traffic light detection. We derived the runtimes on a laptop GPU just to get a rough understanding of performances and runtimes. We gained these initial insights:
 * "ssd_mobilenet_v1" from 2017, < 75 ms/frame
 * "rfcn_resnet101", <110 ms/frame
 * "faster_rcnn_inception_resnet_v2", <450 ms/frame
 
-From the following video it can be seen that the better the model, the better the detections are, coming with higher runtimes (see above). 
+Later we switched to desktop GPUs to be comparable to the Titan X in Carla.
+
+From the following video it can be seen that the better the model, the better the detections are, coming with higher runtimes (see above).
 
 [![tl detection on real world examples](./results/all_00000027.png)](https://youtu.be/xgD799cP8xs)
 
-Nevertheless we used ssd_mobilenet from 2018 (ssd_inception_v2_coco_2018_01_28) for lower runtimes in the beginning for 2 reasons:
+Nevertheless we used detector, pre-trained on COCO dataset from [Tensorflow detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) — [ssd_inception_v2_coco_2018_01_28](http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz) from 2018 for lower runtimes in the beginning for 2 reasons:
 * we started with tensorflow without GPU support, giving us over 400% CPU load
 * also on potential reviewers computers, there could be no GPU support, and we wanted to avoid that the reviewers system gets overloaded while testing on the simulator
 
-Additionally, we only analyze every Nth frame (N=2) to be on the safe side. 
+Additionally, we only analyze every Nth frame (N=2) to be on the safe side.
+
+As you can notice, our model was trained with Tensorflow 1.12. Thus, we converted it to be compatible with Tensorflow 1.3 using this [instructions](https://stackoverflow.com/questions/53927700/how-to-use-object-detection-api-with-an-old-version-of-tensorflow-v1-3-0). The same was done to other models, mentioned in this README.
 
 ## Results
 
@@ -126,11 +134,14 @@ The sequences (especially the last one) are pretty tough because of:
 * exposure time pretty high sometimes
 * camera images in the last sequence not sharp
 
-Therefore, we decided to test further DL object detection models to improve the detection rate, insights:
-* faster_rcnn_resnet101_coco_2018_01_28 106ms 32% detects really good, but only at 5Hz;
-* rfcn_resnet101_coco_2018_01_28 92ms 30% good detector, but only about 6Hz;
-* faster_rcnn_resnet50_coco_2018_01_28 89ms 30% almost the same as previous;
-* faster_rcnn_inception_v2_coco_2018_01_28 58ms 28% similar detection quality, but 2x faster than prev one — 14Hz on a GeForce GTX 1060
+Therefore, we decided to test further DL object detection models from [Tensorflow detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) to improve the detection rate, insights:
+
+| Name | Inference on Titan X, ms | COCO mAP, % | Comments |
+|------|--------------------------|-------------|----------|
+| faster_rcnn_resnet101_coco_2018_01_28 | 106 | 32 | detects really good, but only at 5Hz |
+| rfcn_resnet101_coco_2018_01_28 | 92 | 30 | good detector, but only about 6Hz |
+| faster_rcnn_resnet50_coco_2018_01_28 | 89 | 30 | almost the same as previous |
+| faster_rcnn_inception_v2_coco_2018_01_28 | 58 | 28 | similar detection quality, but 2x faster than prev one — 14Hz on a GeForce GTX 1060 |
 
 In the following videos, the better detection results via the faster_rcnn model can be seen:
 
@@ -146,7 +157,7 @@ In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model
 We learned that the entire system heavily depends on the available hardware. Especially, if the GPU is enabled, tensorflow can benefit from it, and the overall runtime improves heavily.
 
 <br>
-The rest of this document is the original README.md that we kept as a reference and a tutorial for playing the rosbag files.
+The rest of this document is the original README.md that we kept as a reference and a tutorial for playing the rosbag files. Actually, for testing with rosbag files, we created special launch file, so you need to launch bag.launch, instead of site.launch.
 
 <br><br><br>
 
