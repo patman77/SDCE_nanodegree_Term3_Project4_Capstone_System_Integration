@@ -96,13 +96,13 @@ From the following video it can be seen that the better the model, the better th
 
 [![tl detection on real world examples](./results/all_00000027.png)](https://youtu.be/xgD799cP8xs)
 
-Nevertheless we used detector, pre-trained on COCO dataset from [Tensorflow detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) — [ssd_inception_v2_coco_2018_01_28](http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz) from 2018 for lower runtimes in the beginning for 2 reasons:
+Nevertheless we used detector pre-trained on COCO dataset from [Tensorflow detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) — [ssd_inception_v2_coco_2018_01_28](http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz) for lower runtimes in the beginning for 2 reasons:
 * we started with tensorflow without GPU support, giving us over 400% CPU load
 * also on potential reviewers computers, there could be no GPU support, and we wanted to avoid that the reviewers system gets overloaded while testing on the simulator
 
 Additionally, we only analyze every Nth frame (N=2) to be on the safe side.
 
-As you can notice, our model was trained with Tensorflow 1.12. Thus, we converted it to be compatible with Tensorflow 1.3 using this [instructions](https://stackoverflow.com/questions/53927700/how-to-use-object-detection-api-with-an-old-version-of-tensorflow-v1-3-0). The same was done to other models, mentioned in this README.
+As you can notice, our model was trained with Tensorflow 1.12. Thus, we converted it to be compatible with Tensorflow 1.3 using this  [solution](https://stackoverflow.com/questions/53927700/how-to-use-object-detection-api-with-an-old-version-of-tensorflow-v1-3-0). The same was done to other models, mentioned in this README.
 
 ## Results
 
