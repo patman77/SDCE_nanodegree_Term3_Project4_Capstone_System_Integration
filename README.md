@@ -115,9 +115,9 @@ We also tested the traffic light detection on real word examples, given by the s
 
 [![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](https://youtu.be/Mr8ivR8QFG4)
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](https://youtu.be/lQmHsSKVL1A)
+[![tl detection on 2nd rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](https://youtu.be/lQmHsSKVL1A)
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](https://youtu.be/c6epbZUWT1s)
+[![tl detection on 3rd rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](https://youtu.be/c6epbZUWT1s)
 
 The sequences (especially the last one) are pretty tough because of:
 * front window reflections
@@ -131,6 +131,13 @@ Therefore, we decided to test further DL object detection models to improve the 
 * rfcn_resnet101_coco_2018_01_28 92ms 30% good detector, but only about 6Hz;
 * faster_rcnn_resnet50_coco_2018_01_28 89ms 30% almost the same as previous;
 * faster_rcnn_inception_v2_coco_2018_01_28 58ms 28% similar detection quality, but 2x faster than prev one — 14Hz on a GeForce GTX 1060
+
+in the following videos, the better detection results via the faster_rcnn model can be seen:
+
+[![improved tl detection on loop rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/Zgs7yY_50fU)
+<br><br>
+[![improved tl detection on trafficlight rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/W2gGK-pVUQM)
+
 
 In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
 
