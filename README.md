@@ -60,7 +60,7 @@ This method was also motivated by the fact that we had a lot of issues with late
 
 We all went through the classroom lessons and implemented the concepts presented in the video walkthroughs including the ROS nodes waypoint updater, DBW, and later the traffic light detection. One essential part remaining was exactly this traffic light detection and classification. For the simulation we recognized that traffic lights are available as 'ground truth', which worked fine, compare the following video:
 
-[![Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264_00000071.png)](./results/capstone-submission01-2019-08-29_05.25.15_h264.mp4)
+[![Traffic Light Detection in the simulator](./results/capstone-submission01-2019-08-29_05.25.15_h264_00000071.png)](https://youtu.be/PU90_rMJark)
 
 For real camera images without the available ground truth information from the simulator, we thought about two possibilities:
 * using a classical approach, namely HOG+SVM, as we already implemented in Term 1 for the vehicle detection
@@ -88,7 +88,7 @@ From the detection lab in the course, we initially tried the DL models to get a 
 
 From the following video it can be seen that the better the model, the better the detections are, coming with higher runtimes (see above). 
 
-[![tl detection on real world examples](./results/all_00000027.png)](./results/all.mp4)
+[![tl detection on real world examples](./results/all_00000027.png)](https://youtu.be/xgD799cP8xs)
 
 Nevertheless we used ssd_mobilenet from 2018 (ssd_inception_v2_coco_2018_01_28) for lower runtimes in the beginning for 2 reasons:
 * we started with tensorflow without GPU support, giving us over 400% CPU load
@@ -101,7 +101,7 @@ Additionally, we only analyze every Nth frame (N=2) to be on the safe side.
 ### Simulator
 Finally, the entire system works as expected, which can be seen in the following video:
 
-[![Final run in the simulator with DL based tl detection](./results/full_run_gpu_h264_00000170.png)](./results/full_run_gpu_h264.mp4)
+[![Final run in the simulator with DL based tl detection](./results/full_run_gpu_h264_00000170.png)](https://youtu.be/pw6uTMEGYgM)
 
 An additional ROS topic "/image_color_detect", which can be seen in the top left corner shows the current detections, together with the confidences. The rqt topic monitor in the middle clearly shows that all messages related to vehicle steering are approximately at the desired 50Hz. On the right side we see the GPU load of 40%, rendered with "nvidia-smi". On that particular system, we had tensorflow-gpu on an NVIDIA GeForce GTX 1060, so below the hardware equipment of Carla with a Titan X. On the lower right "top" shows the approx. CPU loads:
 
@@ -113,11 +113,11 @@ An additional ROS topic "/image_color_detect", which can be seen in the top left
 
 We also tested the traffic light detection on real word examples, given by the supplied rosbag files:
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](./results/tl-realvideo01-2019-08-29_23.43.14.mp4)
+[![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](https://youtu.be/Mr8ivR8QFG4)
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](./results/tl-realvideo02-2019-08-29_23.53.13.mp4)
+[![tl detection on 2nd rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](https://youtu.be/lQmHsSKVL1A)
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](./results/tl-realvideo03-2019-08-30_00.02.08.mp4)
+[![tl detection on 3rd rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](https://youtu.be/c6epbZUWT1s)
 
 The sequences (especially the last one) are pretty tough because of:
 * front window reflections
@@ -131,6 +131,13 @@ Therefore, we decided to test further DL object detection models to improve the 
 * rfcn_resnet101_coco_2018_01_28 92ms 30% good detector, but only about 6Hz;
 * faster_rcnn_resnet50_coco_2018_01_28 89ms 30% almost the same as previous;
 * faster_rcnn_inception_v2_coco_2018_01_28 58ms 28% similar detection quality, but 2x faster than prev one — 14Hz on a GeForce GTX 1060
+
+In the following videos, the better detection results via the faster_rcnn model can be seen:
+
+[![improved tl detection on loop rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/Zgs7yY_50fU)
+<br><br>
+[![improved tl detection on trafficlight rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/W2gGK-pVUQM)
+
 
 In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
 
