@@ -113,7 +113,7 @@ An additional ROS topic "/image_color_detect", which can be seen in the top left
 
 We also tested the traffic light detection on real word examples, given by the supplied rosbag files:
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](./results/tl-realvideo01-2019-08-29_23.43.14.mp4)
+[![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](https://youtu.be/Mr8ivR8QFG4)
 
 [![tl detection on 1st rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](./results/tl-realvideo02-2019-08-29_23.53.13.mp4)
 
