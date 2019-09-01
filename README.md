@@ -248,7 +248,7 @@ catkin_make
 source devel/setup.sh
 roslaunch launch/bag.launch
 ```
-5. Confirm that traffic light detection works on real life images by looking in topic /image_color_detect with rqt ImageView, or rviz.
+5. Confirm that traffic light detection works on real life images by looking on topic /image_color_detect with rqt ImageView, or rviz.
 
 ### Carla running (Udacity Self-Driving Car)
 1. Launch Carla
