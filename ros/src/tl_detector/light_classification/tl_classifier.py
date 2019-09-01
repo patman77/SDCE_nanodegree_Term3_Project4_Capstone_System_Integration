@@ -1,4 +1,5 @@
 from styx_msgs.msg import TrafficLight
+import rospy
 
 import tensorflow as tf
 import numpy as np
@@ -140,7 +141,7 @@ class TLClassifier(object):
                     tl_st = TrafficLight.UNKNOWN
 
                 # debug
-                print("%s: %.3f, bbox: %s"%(self.tl_colors[tl_st], score, bbox))
+                rospy.logdebug("%s: %.3f, bbox: %s"%(self.tl_colors[tl_st], score, bbox))
 
         if len(set(tl_states)) == 1:
             tl_state = tl_states[0]

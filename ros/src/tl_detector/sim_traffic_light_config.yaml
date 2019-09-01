@@ -11,5 +11,6 @@ stop_line_positions:
     - [161.76, 2303.82]
     - [351.84, 1574.65]
 is_site: False
+is_bag: False
 model_name: 'ssd_inception_v2_coco_2018_01_28'
 roi: [0.0, 0.0, 1.0, 1.0]
