@@ -121,11 +121,11 @@ An additional ROS topic "/image_color_detect", which can be seen in the top left
 
 We also tested the traffic light detection on real word examples, given by the supplied rosbag files:
 
-[![tl detection on 1st rosbag file](./results/tl-realvideo01-2019-08-29_23.43.14_00000034.png)](https://youtu.be/Mr8ivR8QFG4)
+[![tl detection on 1st rosbag file](./results/ssd-rosbag_justtrafficlight-2019-09-02_01.49.51_00000670.png)](https://youtu.be/JrgypaOlld0)
 
-[![tl detection on 2nd rosbag file](./results/tl-realvideo02-2019-08-29_23.53.13_00000016.png)](https://youtu.be/lQmHsSKVL1A)
+[![tl detection on 2nd rosbag file](./results/ssd-rosbag_loop-2019-09-02_01.55.15_00001120.png)](https://youtu.be/X8ZdUgSqAtk)
 
-[![tl detection on 3rd rosbag file](./results/tl-realvideo03-2019-08-30_00.02.08_00000271.png)](https://youtu.be/c6epbZUWT1s)
+[![tl detection on 3rd rosbag file](./results/ssd-rosbag_trainingseq-2019-09-02_02.03.35_00002429.png)](https://youtu.be/ZgElg7v4ePo)
 
 The sequences (especially the last one) are pretty tough because of:
 * front window reflections
@@ -133,6 +133,8 @@ The sequences (especially the last one) are pretty tough because of:
 * the traffic light color is not always clearly visible
 * exposure time pretty high sometimes
 * camera images in the last sequence not sharp
+
+With "ssd_inception_v2_coco_2018_01_28", the traffic light detections were correct in case of occurrence, but the availability was rather low.
 
 Therefore, we decided to test further DL object detection models from [Tensorflow detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) to improve the detection rate, insights:
 
@@ -150,7 +152,7 @@ In the following videos, the better detection results via the faster_rcnn model 
 [![improved tl detection on trafficlight rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/W2gGK-pVUQM)
 
 
-In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
+In conclusion, we perform the tl detection with a simpler "ssd_inception_v2_coco_2018_01_28" model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
 
 ### Lessons Learned
 
