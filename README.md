@@ -134,7 +134,7 @@ The sequences (especially the last one) are pretty tough because of:
 * exposure time pretty high sometimes
 * camera images in the last sequence not sharp
 
-With "ssd_mobilenet_v1", the traffic light detections were correct in case of occurrence, but the availability was rather low.
+With "ssd_inception_v2_coco_2018_01_28", the traffic light detections were correct in case of occurrence, but the availability was rather low.
 
 Therefore, we decided to test further DL object detection models from [Tensorflow detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) to improve the detection rate, insights:
 
@@ -152,7 +152,7 @@ In the following videos, the better detection results via the faster_rcnn model 
 [![improved tl detection on trafficlight rosbag file](./results/tfgpu-tldetection-lot-2019-09-01_03.34.05_00000040.png)](https://youtu.be/W2gGK-pVUQM)
 
 
-In conclusion, we perform the tl detection with a simpler ssd_mobilenet_v2 model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
+In conclusion, we perform the tl detection with a simpler "ssd_inception_v2_coco_2018_01_28" model when running in simulator (roslaunch with styx.launch), and switch to a "faster_rcnn_inception_v2 model" when running on Carla (roslaunch with site.launch).
 
 ### Lessons Learned
 
