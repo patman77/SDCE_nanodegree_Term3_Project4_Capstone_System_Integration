@@ -20,10 +20,15 @@ class Controller(object):
         mn = 0.0    # minimum throttle value
         mx = 0.2    # maximum throttle value
         self.throttle_controller = PID(kp, ki, kd, mn, mx)
+        kd_steer = 0.1
+        self.steer_controller = PID(kp, ki, kd_steer, mn, max_steer_angle)
 
         tau = 0.5   # 1/(2*pi*tau) = curoff frequency
-        ts  = 0.02  # sampling time 
-        self.vel_lpf = LowPassFilter(tau, ts)
+        ts  = 0.02  # sampling time
+        self.vel_lpf   = LowPassFilter(tau, ts)
+        tau_steer = 0.2
+        ts_steer  = 1.0
+        self.steer_lpf = LowPassFilter(tau_steer, ts_steer)
 
         self.vehicle_mass = vehicle_mass
         self.fuel_capacity = fuel_capacity
@@ -45,6 +50,8 @@ class Controller(object):
        	current_vel = self.vel_lpf.filt(current_vel)
 
        	steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+        # apply low pass filter on steering
+        #steering = self.steer_lpf.filt(steering) # doesn't get better but worse
 
        	vel_error = linear_vel - current_vel
        	self.last_vel = current_vel
